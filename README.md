@@ -21,7 +21,9 @@ Options:
 
 ## Installation
 
-This tool is not yet published to NPM, [though I plan to set that up at some point (#2)](https://github.com/jeremiak/geotiff2geojson/issues/2). In the meantime, here's how to install.
+`npm install -g geotiff2geojson`
+
+If you want to do development or install from `main`, you can run the following steps:
 
 1. `git clone git@github.com:jeremiak/geotiff2geojson.git`
 2. `cd geotiff2geojson`
