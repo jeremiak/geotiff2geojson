@@ -1,5 +1,8 @@
 # geotiff2geojson
 
+[![geotiff2geojson on NPM](https://nodei.co/npm/geotiff2geojson.png?compact=true)](https://npmjs.org/package/geotiff2geojson)
+
+
 Convert a GeoTIFF image into a GeoJSON `FeatureCollection` of `Point` features.
 
 ```
