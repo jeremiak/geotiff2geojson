@@ -1,0 +1,25 @@
+{
+    "name": "geotiff2geojson",
+    "version": "1.0.0",
+    "description": "Convert a GeoTIFF image into a GeoJSON FeatureCollection of Point features",
+    "main": "index.mjs",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "geotiff",
+        "geojson",
+        "cli"
+    ],
+    "author": "Jeremia Kimelman <jbkimelman@gmail.com>",
+    "license": "ISC",
+    "dependencies": {
+        "commander": "^8.2.0",
+        "geotiff": "^1.0.6",
+        "geotiff-geokeys-to-proj4": "^2021.7.19-beta",
+        "proj4": "^2.7.5"
+    },
+    "bin": {
+        "geotiff2geojson": "./index.mjs"
+    }
+}
