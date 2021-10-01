@@ -12,7 +12,7 @@ const program = new Command()
 
 program
     .option('-i, --input <file>', 'GeoTIFF file ')
-    .option('-f, --filter <expression>', 'Filter out features, value is assigned to "d"', 'd !== -999000000')
+    .option('-f, --filter <expression>', 'Filter out features, value is assigned to "d"')
     .option('-o, --output <file>', 'GeoJSON file to write, standard out used if missing')
     .option('-p, --proj <projection>', 'Projection to use', 'WGS84')
     .option('--pretty-print', 'Pretty-print GeoJSON')
@@ -46,7 +46,7 @@ let color0 = raster[0]; // Raster is a TypedArray where elements are colors and 
 color0.forEach((d, i) => {
     const context = { d }
     vm.createContext(context)
-    if (!vm.runInContext(options.filter, context)) return
+    if (options.filter && !vm.runInContext(options.filter, context)) return
 
     const y = Math.floor(i / maxX)
     const x = i % maxX
