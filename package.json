@@ -17,7 +17,9 @@
         "commander": "^8.2.0",
         "geotiff": "^1.0.6",
         "geotiff-geokeys-to-proj4": "^2021.7.19-beta",
-        "proj4": "^2.7.5"
+        "progress": "^2.0.3",
+        "proj4": "^2.7.5",
+        "stream-transform": "^2.1.3"
     },
     "bin": {
         "geotiff2geojson": "./index.mjs"
