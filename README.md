@@ -9,8 +9,9 @@ Convert a GeoTIFF image into a GeoJSON `FeatureCollection` of `Point` features.
 Usage: geotiff2geojson [options]
 
 Options:
-  -i, --input <file>         GeoTIFF file
+  -b, --band <index>         The band that contains the data (default: 0)
   -f, --filter <expression>  Filter out features, value is assigned to "d"
+  -i, --input <file>         GeoTIFF file
   -o, --output <file>        GeoJSON file to write, standard out used if missing
   -p, --proj <projection>    Projection to use (default: "WGS84")
   -v, --verbose              Provide more detailed output, use with -o only

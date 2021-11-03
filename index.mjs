@@ -2,7 +2,6 @@
 
 import fs from 'fs'
 import path from 'path'
-import vm from 'vm'
 
 import { Command } from 'commander/esm.mjs';
 import { fromFile } from 'geotiff'
@@ -15,8 +14,9 @@ const cwd = process.cwd()
 const program = new Command()
 
 program
-    .option('-i, --input <file>', 'GeoTIFF file ')
+    .option('-b, --band <index>', 'The band that contains the data', 0)
     .option('-f, --filter <expression>', 'Filter out features, value is assigned to "d"')
+    .option('-i, --input <file>', 'GeoTIFF file ')
     .option('-o, --output <file>', 'GeoJSON file to write, standard out used if missing')
     .option('-p, --proj <projection>', 'Projection to use', 'WGS84')
     .option('-v, --verbose', 'Provide more detailed output, use with -o only')
@@ -25,7 +25,7 @@ program
 program.parse(process.argv)
 
 const options = program.opts()
-const { input, prettyPrint, output, verbose } = options
+const { band, filter, input, prettyPrint, output, verbose } = options
 
 if (!input) {
     throw new Error('Input file required, use -i flag or --help for more information')
@@ -36,13 +36,11 @@ if (!output && verbose) {
 }
 
 const writeStream = output ? fs.createWriteStream(path.resolve(cwd, output)) : process.stdout
-
 const tiff = await fromFile(input)
-const image = await tiff.getImage()
+const image = await tiff.getImage(0)
 const geoKeys = image.getGeoKeys()
 const projObj = geokeysToProj4.toProj4(geoKeys)
 const projection = proj4(projObj.proj4, options.proj)
-
 const maxX = image.getWidth()
 const maxY = image.getHeight()
 const origin = image.getOrigin()
@@ -51,23 +49,22 @@ const xSize = resolution[0]
 const ySize = resolution[1]
 
 let raster = await image.readRasters({ window: [0, 0, maxX, maxY] });
-let color0 = raster[0]
+let color = raster[band]
 let isFirst = true
 
 const bar = verbose ? new Progress('Processing [:bar] :percent :etas', {
-    total: color0.length,
+    total: color.length,
     width: 40,
 }) : null
 
-
+const filterFn = filter && Function(`return function f(d) { return ${filter} }`)()
 const transformer = transform(args => {
-    const [d, i, total] = args
-    if (options.filter) {
-        const context = { d }
-        vm.createContext(context)
-        if (!vm.runInContext(options.filter, context)) {
-            return null
-        }
+    const [d, i, isLast] = args
+
+    if (filter && !filterFn(d)) {
+        if (bar) bar.tick()
+        if (isLast) return `]}`
+        return null
     }
 
     const y = Math.floor(i / maxX)
@@ -106,7 +103,7 @@ const transformer = transform(args => {
         }
     }
     const geojson = prettyPrint ? JSON.stringify(feature, null, 2) : JSON.stringify(feature)
-    const row = `${isFirst ? '' : ','}${geojson}\n${i === total - 1 ? ']}' : ''}`
+    const row = `${isFirst ? '' : ','}${geojson}\n${isLast ? ']}' : ''}`
     isFirst = false
     if (bar) bar.tick()
     return row
@@ -116,6 +113,8 @@ writeStream.write('{ "type": "FeatureCollection", "features": [\n')
 
 transformer.pipe(writeStream)
 
-color0.forEach((d, i) => {
-    transformer.write([d, i, color0.length])
+color.forEach((d, i) => {
+    const isLast = color.length - 1 === i
+        // console.log({ isLast })
+    transformer.write([d, i, isLast])
 })
