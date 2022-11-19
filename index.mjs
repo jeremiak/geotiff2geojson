@@ -48,6 +48,8 @@ const resolution = image.getResolution()
 const xSize = resolution[0]
 const ySize = resolution[1]
 
+const x = image.pixelIsArea()
+
 let raster = await image.readRasters({ window: [0, 0, maxX, maxY] });
 let color = raster[band]
 let isFirst = true
@@ -113,8 +115,8 @@ writeStream.write('{ "type": "FeatureCollection", "features": [\n')
 
 transformer.pipe(writeStream)
 
-color.forEach((d, i) => {
+for (let i = 0; i < color.length; i++) {
+    const d = color[i]
     const isLast = color.length - 1 === i
-        // console.log({ isLast })
     transformer.write([d, i, isLast])
-})
+}
